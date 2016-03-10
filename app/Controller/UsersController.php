@@ -4,6 +4,7 @@ class UsersController extends AppController
 {
 
 	public $helpers = array('Form','Html','Time');
+	public $components= array('Session');
 
 	public function index()
 	{
@@ -26,6 +27,22 @@ class UsersController extends AppController
 		}
 		$this->set('user', $user);
 
+	}
+
+	public function nuevo()
+	{
+		if ($this->request->is('post')) 
+		{
+			$this->User->create();
+			if ($this->User->save($this->request->data)) 
+			{
+				$this->Sesion->setFlash('el  usuario se creo con exito');
+				return $this->redirect(array('action'=>'index'));
+
+			}
+			$this->Sesion->setFlash('no se pudo crear el usuario');
+
+		}
 	}
 
 
