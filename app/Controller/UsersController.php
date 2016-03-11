@@ -3,19 +3,36 @@
 class UsersController extends AppController
 {
 
-	public $helpers = array('Html','Form');
+	public $helpers = array('Form','Html','Time');
 
-/**
-interactuar con el modelo de la base de datos
-*/
 	public function index()
 	{
-		$this->set('users', $this->Users->find('all'));
-
+		$this->set('users', $this->User->find('all'));
 
 	}
+
+	public function ver($id=null){
+
+		if (!$id) {
+			throw new NotFoundException('Datos Invalidos');
+			
+		}
+
+		$user = $this->User->findById($id);
+
+		if (!$user) 
+		{
+			throw new NotFoundException('el usuario no existe');
+		}
+		$this->set('user', $user);
+
+	}
+
+
+
+
 }
 
 
-
  ?>
+

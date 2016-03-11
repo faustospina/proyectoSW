@@ -1,0 +1,1 @@
+<h2>Detalle del usuario <?php echo $user['User']['user_name']; ?></h2>
