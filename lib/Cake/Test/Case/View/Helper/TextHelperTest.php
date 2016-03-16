@@ -26,7 +26,7 @@ App::uses('TextHelper', 'View/Helper');
  */
 class TextHelperTestObject extends TextHelper {
 
-	public function attach(CakeTextMock $string) {
+	public function attach(StringMock $string) {
 		$this->_engine = $string;
 	}
 
@@ -37,11 +37,11 @@ class TextHelperTestObject extends TextHelper {
 }
 
 /**
- * CakeTextMock class
+ * StringMock class
  *
  * @package       Cake.Test.Case.View.Helper
  */
-class CakeTextMock {
+class StringMock {
 }
 
 /**
@@ -81,11 +81,11 @@ class TextHelperTest extends CakeTestCase {
 		$methods = array(
 			'highlight', 'stripLinks', 'truncate', 'tail', 'excerpt', 'toList',
 			);
-		$CakeText = $this->getMock('CakeTextMock', $methods);
-		$Text = new TextHelperTestObject($this->View, array('engine' => 'CakeTextMock'));
-		$Text->attach($CakeText);
+		$String = $this->getMock('StringMock', $methods);
+		$Text = new TextHelperTestObject($this->View, array('engine' => 'StringMock'));
+		$Text->attach($String);
 		foreach ($methods as $method) {
-			$CakeText->expects($this->at(0))->method($method);
+			$String->expects($this->at(0))->method($method);
 			$Text->{$method}('who', 'what', 'when', 'where', 'how');
 		}
 	}
@@ -117,10 +117,6 @@ class TextHelperTest extends CakeTestCase {
  * @return void
  */
 	public function testAutoLink() {
-		$text = 'The AWWWARD show happened today';
-		$result = $this->Text->autoLink($text);
-		$this->assertEquals($text, $result);
-
 		$text = 'This is a test text';
 		$expected = 'This is a test text';
 		$result = $this->Text->autoLink($text);

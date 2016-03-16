@@ -1,5 +1,7 @@
 <?php
 /**
+ * PostgreSQL layer for DBO.
+ *
  * CakePHP(tm) : Rapid Development Framework (http://cakephp.org)
  * Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
  *
@@ -98,7 +100,7 @@ class Postgres extends DboSource {
  *
  * @var array
  */
-	protected $_sqlOps = array('like', 'ilike', 'or', 'not', 'in', 'between', '~', '~\*', '\!~', '\!~\*', 'similar to');
+	protected $_sqlOps = array('like', 'ilike', 'or', 'not', 'in', 'between', '~', '~*', '!~', '!~*', 'similar to');
 
 /**
  * Connects to the database using options in the given configuration array.
@@ -556,11 +558,7 @@ class Postgres extends DboSource {
 									$colList[] = 'ALTER COLUMN ' . $fieldName . '  SET DEFAULT NULL';
 									$colList[] = 'ALTER COLUMN ' . $fieldName . ' TYPE ' . str_replace(array($fieldName, 'NOT NULL'), '', $this->buildColumn($col)) . ' USING CASE WHEN TRUE THEN 1 ELSE 0 END';
 								} else {
-									if ($original['type'] === 'text' && $col['type'] === 'integer') {
-										$colList[] = 'ALTER COLUMN ' . $fieldName . ' TYPE ' . str_replace(array($fieldName, 'NOT NULL'), '', $this->buildColumn($col)) . " USING cast({$fieldName} as INTEGER)";
-									} else {
-										$colList[] = 'ALTER COLUMN ' . $fieldName . ' TYPE ' . str_replace(array($fieldName, 'NOT NULL'), '', $this->buildColumn($col));
-									}
+									$colList[] = 'ALTER COLUMN ' . $fieldName . ' TYPE ' . str_replace(array($fieldName, 'NOT NULL'), '', $this->buildColumn($col));
 								}
 
 								if (isset($nullable)) {

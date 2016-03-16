@@ -271,8 +271,8 @@ class CacheHelper extends AppHelper {
  *
  * @param string $content view content to write to a cache file.
  * @param string $timestamp Duration to set for cache file.
- * @param bool|null $useCallbacks Whether to include statements in cached file which
- *   run callbacks, otherwise null.
+ * @param bool $useCallbacks Whether to include statements in cached file which
+ *   run callbacks.
  * @return bool success of caching view.
  */
 	protected function _writeFile($content, $timestamp, $useCallbacks = false) {
@@ -294,7 +294,7 @@ class CacheHelper extends AppHelper {
 		$cache = strtolower(Inflector::slug($path));
 
 		if (empty($cache)) {
-			return null;
+			return;
 		}
 		$cache = $cache . '.php';
 		$file = '<!--cachetime:' . $cacheTime . '--><?php';

@@ -432,7 +432,6 @@ class ExtractTask extends AppShell {
 					$category = isset($category) ? $category : 6;
 					$category = (int)$category;
 					$categoryName = $categories[$category];
-
 					$domain = isset($domain) ? $domain : 'default';
 					$details = array(
 						'file' => $this->_file,
@@ -444,11 +443,8 @@ class ExtractTask extends AppShell {
 					if (isset($context)) {
 						$details['msgctxt'] = $context;
 					}
-					// Skip LC_TIME files as we use a special file format for them.
-					if ($categoryName !== 'LC_TIME') {
-						$this->_addTranslation($categoryName, $domain, $singular, $details);
-					}
-				} elseif (!is_array($this->_tokens[$count - 1]) || $this->_tokens[$count - 1][0] != T_FUNCTION) {
+					$this->_addTranslation($categoryName, $domain, $singular, $details);
+				} else {
 					$this->_markerError($this->_file, $line, $functionName, $count);
 				}
 			}

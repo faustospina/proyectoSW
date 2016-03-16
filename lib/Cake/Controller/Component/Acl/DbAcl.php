@@ -41,6 +41,7 @@ class DbAcl extends Object implements AclInterface {
 
 /**
  * Constructor
+ *
  */
 	public function __construct() {
 		parent::__construct();

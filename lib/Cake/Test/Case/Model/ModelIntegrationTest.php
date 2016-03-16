@@ -226,8 +226,7 @@ class ModelIntegrationTest extends BaseModelTest {
 			'scope' => '1 = 1',
 			'type' => 'nested',
 			'__parentChange' => false,
-			'recursive' => -1,
-			'level' => null
+			'recursive' => -1
 		);
 		$this->assertEquals($expected, $TestModel->Behaviors->Tree->settings['Apple']);
 
@@ -1334,7 +1333,7 @@ class ModelIntegrationTest extends BaseModelTest {
 		$Article->useTable = false;
 		$Article->id = 1;
 		$result = $Article->exists();
-		$this->assertFalse($result);
+		$this->assertTrue($result);
 	}
 
 /**
@@ -1994,7 +1993,7 @@ class ModelIntegrationTest extends BaseModelTest {
 					'afterFind' => 'Successfully added by AfterFind'
 				)
 			));
-		$this->assertEquals(static::date(), $result['Something']['updated']);
+		$this->assertEquals(self::date(), $result['Something']['updated']);
 		unset($result['Something']['updated']);
 		$this->assertEquals($expected, $result);
 	}

@@ -68,7 +68,6 @@ class CakeResponse {
 		415 => 'Unsupported Media Type',
 		416 => 'Requested range not satisfiable',
 		417 => 'Expectation Failed',
-		429 => 'Too Many Requests',
 		500 => 'Internal Server Error',
 		501 => 'Not Implemented',
 		502 => 'Bad Gateway',
@@ -96,7 +95,7 @@ class CakeResponse {
 		'cpio' => 'application/x-cpio',
 		'cpt' => 'application/mac-compactpro',
 		'csh' => 'application/x-csh',
-		'csv' => array('text/csv', 'application/vnd.ms-excel'),
+		'csv' => array('text/csv', 'application/vnd.ms-excel', 'text/plain'),
 		'dcr' => 'application/x-director',
 		'dir' => 'application/x-director',
 		'dms' => 'application/octet-stream',
@@ -452,7 +451,7 @@ class CakeResponse {
 
 /**
  * Formats the Content-Type header based on the configured contentType and charset
- * the charset will only be set in the header if the response is of type text
+ * the charset will only be set in the header if the response is of type text/*
  *
  * @return void
  */
@@ -832,7 +831,7 @@ class CakeResponse {
 			if (!$public && !$private && !$noCache) {
 				return null;
 			}
-			$sharable = $public || !($private || $noCache);
+			$sharable = $public || ! ($private || $noCache);
 			return $sharable;
 		}
 		if ($public) {
@@ -1337,7 +1336,7 @@ class CakeResponse {
 			'download' => null
 		);
 
-		if (strpos($path, '../') !== false || strpos($path, '..\\') !== false) {
+		if (strpos($path, '..') !== false) {
 			throw new NotFoundException(__d(
 				'cake_dev',
 				'The requested file contains `..` and will not be read.'
@@ -1496,10 +1495,9 @@ class CakeResponse {
  * @return bool
  */
 	protected function _clearBuffer() {
-		if (ob_get_length()) {
-			return ob_end_clean();
-		}
-		return true;
+		//@codingStandardsIgnoreStart
+		return @ob_end_clean();
+		//@codingStandardsIgnoreEnd
 	}
 
 /**

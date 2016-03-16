@@ -333,13 +333,15 @@ class PaginatorComponent extends Component {
 		if (isset($this->settings[$alias])) {
 			$defaults = $this->settings[$alias];
 		}
-		$defaults += array(
-			'page' => 1,
-			'limit' => 20,
-			'maxLimit' => 100,
-			'paramType' => 'named'
+		if (isset($defaults['limit']) &&
+			(empty($defaults['maxLimit']) || $defaults['limit'] > $defaults['maxLimit'])
+		) {
+			$defaults['maxLimit'] = $defaults['limit'];
+		}
+		return array_merge(
+			array('page' => 1, 'limit' => 20, 'maxLimit' => 100, 'paramType' => 'named'),
+			$defaults
 		);
-		return $defaults;
 	}
 
 /**
@@ -386,10 +388,6 @@ class PaginatorComponent extends Component {
 		if (!empty($options['order']) && is_array($options['order'])) {
 			$order = array();
 			foreach ($options['order'] as $key => $value) {
-				if (is_int($key)) {
-					$key = $value;
-					$value = 'asc';
-				}
 				$field = $key;
 				$alias = $object->alias;
 				if (strpos($key, '.') !== false) {

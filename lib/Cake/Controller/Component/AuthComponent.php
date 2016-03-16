@@ -50,7 +50,7 @@ class AuthComponent extends Component {
  *
  * @var array
  */
-	public $components = array('Session', 'Flash', 'RequestHandler');
+	public $components = array('Session', 'RequestHandler');
 
 /**
  * An array of authentication objects to use for authenticating users. You can configure
@@ -373,9 +373,7 @@ class AuthComponent extends Component {
 			$this->_stop();
 			return false;
 		}
-		$controller->response->statusCode(403);
-		$controller->response->send();
-		$this->_stop();
+		$controller->redirect(null, 403);
 		return false;
 	}
 
@@ -419,7 +417,7 @@ class AuthComponent extends Component {
 		} else {
 			$url = $this->unauthorizedRedirect;
 		}
-		$controller->redirect($url);
+		$controller->redirect($url, null, true);
 		return false;
 	}
 
@@ -481,7 +479,7 @@ class AuthComponent extends Component {
  */
 	public function constructAuthorize() {
 		if (empty($this->authorize)) {
-			return null;
+			return;
 		}
 		$this->_authorizeObjects = array();
 		$config = Hash::normalize((array)$this->authorize);
@@ -610,7 +608,7 @@ class AuthComponent extends Component {
 		}
 		if ($user) {
 			$this->Session->renew();
-			$this->Session->write(static::$sessionKey, $user);
+			$this->Session->write(self::$sessionKey, $user);
 			$event = new CakeEvent('Auth.afterIdentify', $this, array('user' => $user));
 			$this->_Collection->getController()->getEventManager()->dispatch($event);
 		}
@@ -639,7 +637,7 @@ class AuthComponent extends Component {
 		foreach ($this->_authenticateObjects as $auth) {
 			$auth->logout($user);
 		}
-		$this->Session->delete(static::$sessionKey);
+		$this->Session->delete(self::$sessionKey);
 		$this->Session->delete('Auth.redirect');
 		$this->Session->renew();
 		return Router::normalize($this->logoutRedirect);
@@ -657,10 +655,10 @@ class AuthComponent extends Component {
  * @link http://book.cakephp.org/2.0/en/core-libraries/components/authentication.html#accessing-the-logged-in-user
  */
 	public static function user($key = null) {
-		if (!empty(static::$_user)) {
-			$user = static::$_user;
-		} elseif (static::$sessionKey && CakeSession::check(static::$sessionKey)) {
-			$user = CakeSession::read(static::$sessionKey);
+		if (!empty(self::$_user)) {
+			$user = self::$_user;
+		} elseif (self::$sessionKey && CakeSession::check(self::$sessionKey)) {
+			$user = CakeSession::read(self::$sessionKey);
 		} else {
 			return null;
 		}
@@ -689,7 +687,7 @@ class AuthComponent extends Component {
 		foreach ($this->_authenticateObjects as $auth) {
 			$result = $auth->getUser($this->request);
 			if (!empty($result) && is_array($result)) {
-				static::$_user = $result;
+				self::$_user = $result;
 				return true;
 			}
 		}
@@ -772,12 +770,12 @@ class AuthComponent extends Component {
 /**
  * Loads the configured authentication objects.
  *
- * @return mixed Either null on empty authenticate value, or an array of loaded objects.
+ * @return mixed either null on empty authenticate value, or an array of loaded objects.
  * @throws CakeException
  */
 	public function constructAuthenticate() {
 		if (empty($this->authenticate)) {
-			return null;
+			return;
 		}
 		$this->_authenticateObjects = array();
 		$config = Hash::normalize((array)$this->authenticate);
@@ -842,7 +840,7 @@ class AuthComponent extends Component {
 		if ($message === false) {
 			return;
 		}
-		$this->Flash->set($message, $this->flash);
+		$this->Session->setFlash($message, $this->flash['element'], $this->flash['params'], $this->flash['key']);
 	}
 
 }

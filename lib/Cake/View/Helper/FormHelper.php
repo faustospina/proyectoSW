@@ -203,7 +203,7 @@ class FormHelper extends AppHelper {
 	protected function _introspectModel($model, $key, $field = null) {
 		$object = $this->_getModel($model);
 		if (!$object) {
-			return null;
+			return;
 		}
 
 		if ($key === 'key') {
@@ -408,7 +408,7 @@ class FormHelper extends AppHelper {
 				'action' => $options['action'],
 			);
 			$options['action'] = array_merge($actionDefaults, (array)$options['url']);
-			if (!isset($options['action'][0]) && !empty($id)) {
+			if (empty($options['action'][0]) && !empty($id)) {
 				$options['action'][0] = $id;
 			}
 		} elseif (is_string($options['url'])) {
@@ -428,7 +428,7 @@ class FormHelper extends AppHelper {
 			case 'delete':
 				$append .= $this->hidden('_method', array(
 					'name' => '_method', 'value' => strtoupper($options['type']), 'id' => null,
-					'secure' => static::SECURE_SKIP
+					'secure' => self::SECURE_SKIP
 				));
 			default:
 				$htmlAttributes['method'] = 'post';
@@ -488,7 +488,7 @@ class FormHelper extends AppHelper {
 		}
 		return $this->hidden('_Token.key', array(
 			'value' => $this->request->params['_Token']['key'], 'id' => 'Token' . mt_rand(),
-			'secure' => static::SECURE_SKIP
+			'secure' => self::SECURE_SKIP
 		));
 	}
 
@@ -561,12 +561,12 @@ class FormHelper extends AppHelper {
  *    generating the hash, else $this->fields is being used.
  * @param array $secureAttributes will be passed as html attributes into the hidden
  *    input elements generated for the Security Component.
- * @return string|null A hidden input field with a security hash, otherwise null.
+ * @return string A hidden input field with a security hash
  * @link http://book.cakephp.org/2.0/en/core-libraries/helpers/form.html#FormHelper::secure
  */
 	public function secure($fields = array(), $secureAttributes = array()) {
 		if (!isset($this->request['_Token']) || empty($this->request['_Token'])) {
-			return null;
+			return;
 		}
 		$locked = array();
 		$unlockedFields = $this->_unlockedFields;
@@ -661,8 +661,6 @@ class FormHelper extends AppHelper {
 			if (!in_array($field, $this->fields)) {
 				if ($value !== null) {
 					return $this->fields[$field] = $value;
-				} elseif (isset($this->fields[$field]) && $value === null) {
-					unset($this->fields[$field]);
 				}
 				$this->fields[] = $field;
 			}
@@ -815,10 +813,6 @@ class FormHelper extends AppHelper {
  * ));
  * <label for="post-publish">Publish</label>
  * ```
- *
- * *Warning* Unlike most FormHelper methods, this method does not automatically
- * escape the $text parameter. You must escape the $text parameter yourself if you
- * are using user supplied data.
  *
  * @param string $fieldName This should be "Modelname.fieldname"
  * @param string $text Text that will appear in the label field. If
@@ -1092,13 +1086,13 @@ class FormHelper extends AppHelper {
 				unset($options['options']);
 				return $this->select($fieldName, $list, $options);
 			case 'time':
-				$options += array('value' => $selected);
+				$options['value'] = $selected;
 				return $this->dateTime($fieldName, null, $timeFormat, $options);
 			case 'date':
-				$options += array('value' => $selected);
+				$options['value'] = $selected;
 				return $this->dateTime($fieldName, $dateFormat, null, $options);
 			case 'datetime':
-				$options += array('value' => $selected);
+				$options['value'] = $selected;
 				return $this->dateTime($fieldName, $dateFormat, $timeFormat, $options);
 			case 'textarea':
 				return $this->textarea($fieldName, $options + array('cols' => '30', 'rows' => '6'));
@@ -1209,10 +1203,10 @@ class FormHelper extends AppHelper {
 			if ($options['type'] === 'number' &&
 				!isset($options['step'])
 			) {
-				if ($type === 'decimal' && isset($fieldDef['length'])) {
+				if ($type === 'decimal') {
 					$decimalPlaces = substr($fieldDef['length'], strpos($fieldDef['length'], ',') + 1);
 					$options['step'] = sprintf('%.' . $decimalPlaces . 'F', pow(10, -1 * $decimalPlaces));
-				} elseif ($type === 'float' || $type === 'decimal') {
+				} elseif ($type === 'float') {
 					$options['step'] = 'any';
 				}
 			}
@@ -1293,7 +1287,6 @@ class FormHelper extends AppHelper {
 			isset($fieldDef['length']) &&
 			is_scalar($fieldDef['length']) &&
 			$fieldDef['length'] < 1000000 &&
-			$fieldDef['type'] !== 'decimal' &&
 			$options['type'] !== 'select'
 		);
 		if ($autoLength &&
@@ -1477,15 +1470,6 @@ class FormHelper extends AppHelper {
  * Creates a set of radio widgets. Will create a legend and fieldset
  * by default. Use $options to control this
  *
- * You can also customize each radio input element using an array of arrays:
- *
- * ```
- * $options = array(
- *  array('name' => 'United states', 'value' => 'US', 'title' => 'My title'),
- *  array('name' => 'Germany', 'value' => 'DE', 'class' => 'de-de', 'title' => 'Another title'),
- * );
- * ```
- *
  * ### Attributes:
  *
  * - `separator` - define the string in between the radio buttons
@@ -1568,15 +1552,6 @@ class FormHelper extends AppHelper {
 		$this->_domIdSuffixes = array();
 		foreach ($options as $optValue => $optTitle) {
 			$optionsHere = array('value' => $optValue, 'disabled' => false);
-			if (is_array($optTitle)) {
-				if (isset($optTitle['value'])) {
-					$optionsHere['value'] = $optTitle['value'];
-				}
-
-				$optionsHere += $optTitle;
-				$optTitle = $optionsHere['name'];
-				unset($optionsHere['name']);
-			}
 
 			if (isset($value) && strval($optValue) === strval($value)) {
 				$optionsHere['checked'] = 'checked';
@@ -1596,7 +1571,7 @@ class FormHelper extends AppHelper {
 			if (is_array($between)) {
 				$optTitle .= array_shift($between);
 			}
-			$allOptions = $optionsHere + $attributes;
+			$allOptions = array_merge($attributes, $optionsHere);
 			$out[] = $this->Html->useTag('radio', $attributes['name'], $tagName,
 				array_diff_key($allOptions, array('name' => null, 'type' => null, 'id' => null)),
 				$optTitle
@@ -1702,7 +1677,7 @@ class FormHelper extends AppHelper {
 		unset($options['secure']);
 
 		$options = $this->_initInputField($fieldName, array_merge(
-			$options, array('secure' => static::SECURE_SKIP)
+			$options, array('secure' => self::SECURE_SKIP)
 		));
 
 		if ($secure === true) {
@@ -1723,7 +1698,7 @@ class FormHelper extends AppHelper {
 	public function file($fieldName, $options = array()) {
 		$options += array('secure' => true);
 		$secure = $options['secure'];
-		$options['secure'] = static::SECURE_SKIP;
+		$options['secure'] = self::SECURE_SKIP;
 
 		$options = $this->_initInputField($fieldName, $options);
 		$field = $this->entity();
@@ -2073,7 +2048,7 @@ class FormHelper extends AppHelper {
 		$id = $this->_extractOption('id', $attributes);
 
 		$attributes = $this->_initInputField($fieldName, array_merge(
-			(array)$attributes, array('secure' => static::SECURE_SKIP)
+			(array)$attributes, array('secure' => self::SECURE_SKIP)
 		));
 
 		if (is_string($options) && isset($this->_options[$options])) {
@@ -2237,11 +2212,6 @@ class FormHelper extends AppHelper {
  * @link http://book.cakephp.org/2.0/en/core-libraries/helpers/form.html#FormHelper::year
  */
 	public function year($fieldName, $minYear = null, $maxYear = null, $attributes = array()) {
-		if (is_array($minYear)) {
-			$attributes = $minYear;
-			$minYear = null;
-		}
-
 		$attributes += array('empty' => true, 'value' => null);
 		if ((empty($attributes['value']) || $attributes['value'] === true) && $value = $this->value($fieldName)) {
 			if (is_array($value)) {
@@ -2339,11 +2309,6 @@ class FormHelper extends AppHelper {
  * @link http://book.cakephp.org/2.0/en/core-libraries/helpers/form.html#FormHelper::hour
  */
 	public function hour($fieldName, $format24Hours = false, $attributes = array()) {
-		if (is_array($format24Hours)) {
-			$attributes = $format24Hours;
-			$format24Hours = false;
-		}
-
 		$attributes += array('empty' => true, 'value' => null);
 		$attributes = $this->_dateTimeSelected('hour', $fieldName, $attributes);
 
@@ -3013,7 +2978,7 @@ class FormHelper extends AppHelper {
 			$result['required'] = true;
 		}
 
-		if ($secure === static::SECURE_SKIP) {
+		if ($secure === self::SECURE_SKIP) {
 			return $result;
 		}
 

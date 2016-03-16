@@ -19,7 +19,6 @@
 App::uses('ErrorHandler', 'Error');
 App::uses('Controller', 'Controller');
 App::uses('Router', 'Routing');
-App::uses('Debugger', 'Utility');
 
 /**
  * A faulty ExceptionRenderer to test nesting.
@@ -93,8 +92,6 @@ class ErrorHandlerTest extends CakeTestCase {
 		set_error_handler('ErrorHandler::handleError');
 		$this->_restoreError = true;
 
-		Debugger::getInstance()->output('html');
-
 		ob_start();
 		$wrong .= '';
 		$result = ob_get_clean();
@@ -125,8 +122,6 @@ class ErrorHandlerTest extends CakeTestCase {
 	public function testErrorMapping($error, $expected) {
 		set_error_handler('ErrorHandler::handleError');
 		$this->_restoreError = true;
-
-		Debugger::getInstance()->output('html');
 
 		ob_start();
 		trigger_error('Test error', $error);

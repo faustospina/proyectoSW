@@ -42,7 +42,7 @@ class AssetDispatcher extends DispatcherFilter {
 	public function beforeDispatch(CakeEvent $event) {
 		$url = urldecode($event->data['request']->url);
 		if (strpos($url, '..') !== false || strpos($url, '.') === false) {
-			return null;
+			return;
 		}
 
 		if ($result = $this->_filterAsset($event)) {
