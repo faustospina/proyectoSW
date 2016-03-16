@@ -36,15 +36,24 @@ class UsersController extends AppController
 			$this->User->create();
 			if ($this->User->save($this->request->data)) 
 			{
+<<<<<<< HEAD
 				$this->Session->setFlash('El  usuario ha sido creado', 'default', array('class'=>'success'));
 				return $this->redirect(array('action'=>'index'));
 
 			}
 			$this->Session->setFlash('no se pudo crear el usuario');
+=======
+				$this->Sesion->setFlash('el  usuario se creo con exito');
+				return $this->redirect(array('action'=>'index'));
+
+			}
+			$this->Sesion->setFlash('no se pudo crear el usuario');
+>>>>>>> origin/master
 
 		}
 	}
 
+<<<<<<< HEAD
 	public function editar($id = null){
 		if (!$id) 
 		{
@@ -95,6 +104,8 @@ class UsersController extends AppController
 
 
 	}
+=======
+>>>>>>> origin/master
 
 
 
